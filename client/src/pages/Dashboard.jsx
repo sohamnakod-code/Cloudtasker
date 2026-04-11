@@ -1,55 +1,42 @@
-import { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Layout from "../components/Layout";
+import RichTextEditor from "../components/RichTextEditor";
+import { AIWorkspaceProvider } from "../context/AIWorkspaceContext";
 
-export default function Dashboard() {
-    const [notes, setNotes] = useState([]);
-    const [title, setTitle] = useState("");
-    const { logout, user } = useContext(AuthContext);
+function DashboardContent() {
+    const { user, loading } = useContext(AuthContext);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Agar user logged in nahi hai toh wapas bhej do
-        if (!user) return navigate("/login");
+        if (!loading && !user) {
+            navigate("/login");
+        }
+    }, [user, loading, navigate]);
 
-        axios.get("https://cloudtasker-s6d3.onrender.com/notes")
-            .then(res => setNotes(res.data))
-            .catch(err => console.log(err));
-    }, [user]);
-
-    const addNote = () => {
-        axios.post("https://cloudtasker-s6d3.onrender.com/notes", { title })
-            .then(res => {
-                setNotes([res.data, ...notes]);
-                setTitle("");
-            });
-    };
+    if (loading || !user) {
+        return (
+            <div className="h-screen w-screen flex items-center justify-center bg-background text-text">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
 
     return (
-        <div style={{ padding: '20px', background: '#0f172a', minHeight: '100vh', color: 'white' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
-                <h1>My Dashboard</h1>
-                <button onClick={() => { logout(); navigate("/login"); }} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>Logout</button>
+        <Layout>
+            <div className="h-full w-full">
+                <RichTextEditor />
             </div>
+        </Layout>
+    );
+}
 
-            <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                <input
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                    placeholder="New Note..."
-                    style={{ width: '70%', padding: '10px', borderRadius: '5px', border: 'none' }}
-                />
-                <button onClick={addNote} style={{ padding: '10px 20px', marginLeft: '10px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '5px' }}>Add</button>
-
-                <div style={{ marginTop: '30px' }}>
-                    {notes.map(n => (
-                        <div key={n._id} style={{ background: '#1e293b', padding: '15px', borderRadius: '10px', marginBottom: '10px', borderLeft: '4px solid #3b82f6' }}>
-                            {n.title}
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+// Wrap it with AIWorkspaceProvider so we have access to notes context exactly where we need it
+export default function Dashboard() {
+    return (
+        <AIWorkspaceProvider>
+            <DashboardContent />
+        </AIWorkspaceProvider>
     );
 }
