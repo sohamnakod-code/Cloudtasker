@@ -7,13 +7,13 @@ function App() {
 
   // fetch notes
   useEffect(() => {
-    axios.get("http://localhost:5000/notes")
+    axios.get("https://cloudtasker-s6d3.onrender.com")
       .then(res => setNotes(res.data));
   }, []);
 
   // add note
   const addNote = () => {
-    axios.post("http://localhost:5000/notes", { title })
+    axios.post("https://cloudtasker-s6d3.onrender.com", { title })
       .then(res => setNotes([...notes, res.data]));
   };
 
