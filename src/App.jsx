@@ -13,8 +13,13 @@ function App() {
 
   // add note
   const addNote = () => {
-    axios.post("https://cloudtasker-s6d3.onrender.com", { title })
-      .then(res => setNotes([...notes, res.data]));
+    // URL ke peeche /notes lagana zaroori hai
+    axios.post("https://cloudtasker-s6d3.onrender.com/notes", { title })
+      .then(res => {
+        setNotes([...notes, res.data]);
+        setTitle(""); // Note add hone ke baad input box khali karne ke liye
+      })
+      .catch(err => console.log("Error adding note:", err));
   };
 
   return (
