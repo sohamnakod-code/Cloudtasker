@@ -5,29 +5,30 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [title, setTitle] = useState("");
 
-  // 1. Fetch notes on page load (Refresh fix)
+  // 1. Fetch notes on page load
   useEffect(() => {
     axios.get("https://cloudtasker-s6d3.onrender.com/notes")
-      .then(res => {
-        setNotes(res.data);
-      })
+      .then(res => setNotes(res.data))
       .catch(err => console.log("Fetch error:", err));
   }, []);
 
   // 2. Add note function
   const addNote = () => {
     if (!title) return alert("Kuch toh likho bhai!");
-
     axios.post("https://cloudtasker-s6d3.onrender.com/notes", { title })
       .then(res => {
         setNotes([...notes, res.data]);
-        setTitle(""); // Input box khali karega
+        setTitle("");
       })
       .catch(err => console.log("Error adding note:", err));
   };
 
+  // 3. AI Generate Placeholder (Abhi logic khali hai)
+  const generateAI = () => {
+    alert("Gemini API integrate kar rahe hain... thoda sabar rakho!");
+  };
+
   return (
-    return (
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#0f172a',
@@ -47,7 +48,7 @@ function App() {
           Cloud AI Notes
         </h1>
 
-        {/* Input Box */}
+        {/* Input Box Section */}
         <div style={{
           background: 'rgba(30, 41, 59, 0.7)',
           padding: '20px',
@@ -85,7 +86,7 @@ function App() {
             }}>
               Save Note
             </button>
-            <button style={{
+            <button onClick={generateAI} style={{
               flex: 1,
               padding: '12px',
               borderRadius: '10px',
@@ -100,9 +101,9 @@ function App() {
           </div>
         </div>
 
-        {/* Notes List */}
+        {/* Notes List Section */}
         <div style={{ display: 'grid', gap: '15px' }}>
-          {notes.map(n => (
+          {notes.slice().reverse().map(n => (
             <div key={n._id} style={{
               background: 'rgba(255, 255, 255, 0.05)',
               padding: '20px',
@@ -116,21 +117,6 @@ function App() {
         </div>
       </div>
     </div>
-  );
-
-  <ul style={{ listStyle: "none", padding: 0 }}>
-    {notes.map(n => (
-      <li key={n._id} style={{
-        background: "#f4f4f4",
-        padding: "10px",
-        marginBottom: "5px",
-        borderRadius: "5px"
-      }}>
-        {n.title}
-      </li>
-    ))}
-  </ul>
-    </div >
   );
 }
 
