@@ -28,18 +28,17 @@ export const AIWorkspaceProvider = ({ children }) => {
     };
 
     const addNote = (title) => {
-        return axios.post("https://cloudtasker-s6d3.onrender.com/notes", { title })
+        return axios.post("https://cloudtasker-s6d3.onrender.com/notes", { title, content: "" })
             .then(res => {
                 setNotes([res.data, ...notes]);
                 return res.data;
             });
     };
 
-    // Updating a note using its title as the main content storage (per user feedback)
-    const updateNote = (id, newTitle) => {
-        return axios.put(`https://cloudtasker-s6d3.onrender.com/notes/${id}`, { title: newTitle })
+    const updateNote = (id, updates) => {
+        return axios.put(`https://cloudtasker-s6d3.onrender.com/notes/${id}`, updates)
             .then(res => {
-                setNotes(notes.map(n => n._id === id ? { ...n, title: newTitle } : n));
+                setNotes(notes.map(n => n._id === id ? { ...n, ...updates } : n));
             });
     };
 

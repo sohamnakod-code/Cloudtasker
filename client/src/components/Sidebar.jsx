@@ -7,7 +7,7 @@ export default function Sidebar() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredNotes = notes.filter(note => 
-        (note.title || '').toLowerCase().includes(searchTerm.toLowerCase())
+        (note.title || '').replace(/<[^>]+>/g, '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleAddNote = async () => {
@@ -59,9 +59,10 @@ export default function Sidebar() {
             {/* Notes List */}
             <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1">
                 {filteredNotes.map(note => {
-                    const titleLine = (note.title || '').split('\n')[0].substring(0, 40) || 'Untitled Note';
+                    const cleanTitle = (note.title || '').replace(/<[^>]+>/g, '');
+                    const titleLine = cleanTitle.split('\n')[0].substring(0, 40) || 'Untitled Note';
                     // Very simple tag extraction logic for UI demo
-                    const hasAiTag = note.title && note.title.includes('#');
+                    const hasAiTag = cleanTitle.includes('#');
 
                     return (
                         <div 

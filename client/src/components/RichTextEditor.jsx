@@ -4,32 +4,58 @@ import StarterKit from '@tiptap/starter-kit';
 import { AIWorkspaceContext } from '../context/AIWorkspaceContext';
 import AIToolbar from './AIToolbar';
 import DictationButton from './DictationButton';
-import { Save } from 'lucide-react';
+import { Save, Trash2 } from 'lucide-react';
 
 export default function RichTextEditor() {
-    const { activeNote, updateNote } = useContext(AIWorkspaceContext);
+    const { activeNote, updateNote, deleteNote } = useContext(AIWorkspaceContext);
     const [isSaving, setIsSaving] = useState(false);
     const [isListening, setIsListening] = useState(false);
+    const [title, setTitle] = useState('');
     const saveTimeoutRef = useRef(null);
+    const titleTimeoutRef = useRef(null);
 
     const editor = useEditor({
         extensions: [StarterKit],
-        content: activeNote?.title || '',
+        content: activeNote?.content || activeNote?.title || '',
         onUpdate: ({ editor }) => {
             handleAutoSave(editor.getHTML());
         },
     });
 
+    useEffect(() => {
+        let initialTitle = activeNote?.title || '';
+        if (initialTitle.includes('<')) {
+            initialTitle = initialTitle.replace(/<[^>]+>/g, '');
+        }
+        setTitle(initialTitle);
+    }, [activeNote?._id]);
+
     // Sync editor when activeNote changes
     useEffect(() => {
         if (editor && activeNote) {
-            if (editor.getHTML() !== activeNote.title) {
-                editor.commands.setContent(activeNote.title || '');
+            const desiredContent = activeNote.content || activeNote.title || '';
+            if (editor.getHTML() !== desiredContent) {
+                editor.commands.setContent(desiredContent);
             }
         } else if (editor && !activeNote) {
              editor.commands.setContent('');
         }
     }, [activeNote?._id, editor]);
+
+    const handleTitleChange = (e) => {
+        const newTitle = e.target.value;
+        setTitle(newTitle);
+        if (titleTimeoutRef.current) clearTimeout(titleTimeoutRef.current);
+        titleTimeoutRef.current = setTimeout(() => {
+            updateNote(activeNote._id, { title: newTitle });
+        }, 1000);
+    };
+
+    const handleDelete = () => {
+        if (window.confirm('Are you sure you want to delete this note?')) {
+            deleteNote(activeNote._id);
+        }
+    };
 
     const handleAutoSave = (newContent) => {
         if (!activeNote) return;
@@ -38,7 +64,7 @@ export default function RichTextEditor() {
         
         setIsSaving(true);
         saveTimeoutRef.current = setTimeout(() => {
-            updateNote(activeNote._id, newContent).then(() => {
+            updateNote(activeNote._id, { content: newContent }).then(() => {
                 setIsSaving(false);
             });
         }, 1000); // 1 sec debounce
@@ -76,6 +102,23 @@ export default function RichTextEditor() {
 
     return (
         <div className="w-full h-full lg:max-w-4xl mx-auto flex flex-col bg-surface rounded-2xl border border-glass-border shadow-2xl overflow-hidden glass animate-fade-in">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border-color">
+                <input 
+                    type="text" 
+                    value={title} 
+                    onChange={handleTitleChange} 
+                    placeholder="Note Title" 
+                    className="text-2xl font-bold bg-transparent outline-none w-full text-text focus:border-b focus:border-primary/50 mr-4 transition-colors"
+                />
+                <button 
+                    onClick={handleDelete}
+                    className="p-2 text-textMuted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0 flex gap-2 items-center text-sm font-medium"
+                    title="Delete Note"
+                >
+                    <Trash2 size={18} />
+                </button>
+            </div>
+            
             <AIToolbar 
                 // strip HTML tags to send raw text to AI
                 editorContent={editor?.getText() || ''} 
