@@ -101,22 +101,39 @@ export default function RichTextEditor() {
     }
 
     return (
-        <div className="w-full h-full lg:max-w-4xl mx-auto flex flex-col bg-surface rounded-2xl border border-glass-border shadow-2xl overflow-hidden glass animate-fade-in">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border-color">
-                <input 
-                    type="text" 
-                    value={title} 
-                    onChange={handleTitleChange} 
-                    placeholder="Note Title" 
-                    className="text-2xl font-bold bg-transparent outline-none w-full text-text focus:border-b focus:border-primary/50 mr-4 transition-colors"
-                />
-                <button 
-                    onClick={handleDelete}
-                    className="p-2 text-textMuted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0 flex gap-2 items-center text-sm font-medium"
-                    title="Delete Note"
-                >
-                    <Trash2 size={18} />
-                </button>
+        <div className="w-full h-full lg:max-w-5xl mx-auto flex flex-col bg-surface/40 backdrop-blur-3xl rounded-3xl border border-glass-border shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(255,255,255,0.02)] overflow-hidden animate-fade-in relative">
+            
+            {/* Stunning Header */}
+            <div className="relative group px-10 pt-12 pb-6 border-b border-border-color/30 bg-gradient-to-b from-black/5 dark:from-white/5 to-transparent">
+                
+                <div className="flex items-start justify-between relative z-10 gap-6">
+                    <div className="flex-1">
+                        <input 
+                            type="text" 
+                            value={title} 
+                            onChange={handleTitleChange} 
+                            placeholder="Untitled Note" 
+                            className="text-4xl lg:text-5xl font-black bg-transparent outline-none w-full text-text placeholder-textMuted/30 transition-all tracking-tighter"
+                        />
+                    </div>
+                    
+                    <button 
+                        onClick={handleDelete}
+                        className="group/btn relative flex items-center justify-center w-12 h-12 rounded-2xl bg-surface/50 border border-border-color backdrop-blur-md shadow-sm hover:shadow-lg hover:border-red-500/50 hover:bg-red-500/10 transition-all duration-300 flex-shrink-0 mt-1"
+                        title="Delete Note"
+                    >
+                        <Trash2 size={22} className="text-textMuted group-hover/btn:text-red-500 transition-colors duration-300" />
+                    </button>
+                </div>
+                
+                <div className="flex items-center gap-3 mt-6 text-[10px] font-bold text-textMuted uppercase tracking-[0.2em]">
+                    <span className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface/50 border border-border-color backdrop-blur-sm">
+                        {isSaving ? <span className="flex gap-2 items-center text-primary"><span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Saving...</span> : <><Save size={12} className="opacity-70" /> Saved</>}
+                    </span>
+                    <span className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface/50 border border-border-color backdrop-blur-sm">
+                        {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                </div>
             </div>
             
             <AIToolbar 
@@ -125,19 +142,16 @@ export default function RichTextEditor() {
                 onUpdateContent={handleAIUpdateContent} 
             />
             
-            <div className="flex-1 overflow-y-auto p-6 md:p-10 relative">
-                <div className="absolute top-4 right-4 flex gap-3 z-10">
+            <div className="flex-1 overflow-y-auto px-10 py-8 relative bg-transparent scrollbar-hide">
+                <div className="absolute top-8 right-10 flex gap-3 z-10">
                     <DictationButton 
                         onResult={handleDictationResult} 
                         isListening={isListening} 
                         setIsListening={setIsListening} 
                     />
-                    <div className="text-xs text-textMuted flex items-center gap-1 bg-surface p-1.5 rounded border border-border-color">
-                        {isSaving ? 'Saving...' : <><Save size={14}/> Saved</>}
-                    </div>
                 </div>
 
-                <div className="prose dark:prose-invert max-w-none mt-8 focus:outline-none">
+                <div className="prose prose-lg dark:prose-invert max-w-none focus:outline-none placeholder:text-textMuted/30">
                     <EditorContent editor={editor} />
                 </div>
             </div>

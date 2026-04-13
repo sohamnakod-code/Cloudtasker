@@ -17,79 +17,84 @@ export default function Sidebar() {
     };
 
     return (
-        <div className="w-80 h-full border-r border-border-color glass flex flex-col pt-4 overflow-hidden">
+        <div className="w-full h-full border-r border-border-color bg-surface/30 backdrop-blur-3xl flex flex-col pt-6 overflow-hidden relative z-20">
             {/* Real-time Stats Widget */}
-            <div className="px-4 mb-6">
-                <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex justify-between items-center">
-                    <div>
-                        <div className="text-xs text-textMuted uppercase tracking-wider font-semibold">Writing Streak</div>
-                        <div className="text-2xl font-bold flex items-center gap-2">🔥 {stats.streaks} days</div>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-xs text-textMuted uppercase tracking-wider font-semibold">AI Insights</div>
-                        <div className="text-2xl font-bold text-primary flex items-center gap-1"><BrainCircuit size={20}/> {stats.insights}</div>
+            <div className="px-6 mb-8">
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-5 backdrop-blur-sm group hover:border-primary/40 transition-colors duration-500">
+                    <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-primary/20 blur-3xl group-hover:bg-primary/30 transition-all duration-700 pointer-events-none"></div>
+                    <div className="flex justify-between items-center relative z-10">
+                        <div>
+                            <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">Streak</div>
+                            <div className="text-3xl font-display font-light flex items-center gap-2">🔥 {stats.streaks}</div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">Insights</div>
+                            <div className="text-3xl font-display font-light text-text flex items-end justify-end gap-1"><BrainCircuit size={20} className="text-primary opacity-60 mb-1"/> {stats.insights}</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Smart Search */}
-            <div className="px-4 mb-4">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-textMuted" size={18} />
+            <div className="px-6 mb-6">
+                <div className="relative group/search">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-textMuted group-focus-within/search:text-primary transition-colors duration-300" size={16} />
                     <input 
                         type="text" 
-                        placeholder="Search notes..." 
+                        placeholder="Search workspace..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-black/5 dark:bg-white/5 border border-border-color rounded-lg py-2 pl-10 pr-4 outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
+                        className="w-full bg-black/5 dark:bg-white/5 border border-border-color/50 rounded-xl py-3 pl-12 pr-4 outline-none focus:border-primary/50 focus:bg-transparent transition-all text-sm font-medium placeholder-textMuted/60"
                     />
                 </div>
             </div>
 
-            <div className="px-4 mb-4 flex justify-between items-center">
-                <h2 className="text-sm font-semibold text-textMuted uppercase tracking-wider">Your Notes</h2>
+            <div className="px-6 mb-4 flex justify-between items-center">
+                <h2 className="text-[10px] font-bold text-textMuted uppercase tracking-[0.2em]">All Notes</h2>
                 <button 
                     onClick={handleAddNote}
-                    className="p-1.5 bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-primary/20"
+                    className="p-2 bg-text text-background rounded-lg transition-all duration-300 shadow-md hover:shadow-glow-primary hover:bg-primary hover:-translate-y-0.5 group"
                 >
-                    <Plus size={16} />
+                    <Plus size={16} strokeWidth={3} className="transition-transform group-hover:rotate-90 duration-300" />
                 </button>
             </div>
 
             {/* Notes List */}
-            <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1">
+            <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-1 scrollbar-hide">
                 {filteredNotes.map(note => {
                     const cleanTitle = (note.title || '').replace(/<[^>]+>/g, '');
                     const titleLine = cleanTitle.split('\n')[0].substring(0, 40) || 'Untitled Note';
-                    // Very simple tag extraction logic for UI demo
                     const hasAiTag = cleanTitle.includes('#');
 
                     return (
                         <div 
                             key={note._id}
                             onClick={() => setActiveNote(note)}
-                            className={`p-3 rounded-xl cursor-pointer transition-all flex flex-col gap-2 ${
+                            className={`px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-300 flex flex-col gap-2 relative overflow-hidden ${
                                 activeNote?._id === note._id 
-                                ? 'bg-primary/10 border border-primary/30' 
-                                : 'hover:bg-black/5 dark:hover:bg-white/5 border border-transparent'
+                                ? 'bg-primary/10 border-transparent shadow-sm' 
+                                : 'hover:bg-black/5 dark:hover:bg-white/5 border-transparent opacity-80 hover:opacity-100'
                             }`}
                         >
+                            {activeNote?._id === note._id && (
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-md"></div>
+                            )}
                             <div className="flex items-center gap-3">
-                                <FileText size={18} className={activeNote?._id === note._id ? 'text-primary' : 'text-textMuted'} />
-                                <span className="font-medium text-sm truncate">{titleLine}</span>
+                                <FileText size={16} className={activeNote?._id === note._id ? 'text-primary' : 'text-textMuted/70'} />
+                                <span className={`text-sm truncate ${activeNote?._id === note._id ? 'font-semibold text-text' : 'font-medium text-textMuted'}`}>{titleLine}</span>
                             </div>
                             
                             {hasAiTag && (
-                                <div className="ml-7 flex gap-2 text-xs text-primary bg-primary/10 w-fit px-2 py-0.5 rounded-full items-center">
-                                    <Hash size={10} /> Detected Tags
+                                <div className="ml-7 flex gap-1.5 text-[10px] font-bold text-primary bg-primary/10 w-fit px-2 py-0.5 rounded-full items-center tracking-wide uppercase">
+                                    <Hash size={10} strokeWidth={3} /> Auto-Tagged
                                 </div>
                             )}
                         </div>
                     );
                 })}
                 {filteredNotes.length === 0 && (
-                     <div className="text-center text-sm text-textMuted py-8">
-                        No notes found. Create one!
+                     <div className="text-center text-xs font-medium text-textMuted py-12 px-6 border border-dashed border-border-color rounded-xl mx-2 mt-4">
+                        Press the + button to create a new aesthetic note.
                     </div>
                 )}
             </div>

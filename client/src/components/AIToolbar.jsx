@@ -74,7 +74,7 @@ export default function AIToolbar({ editorContent, onUpdateContent }) {
     );
 
     return (
-        <div className="flex flex-wrap gap-2 p-3 bg-black/5 dark:bg-white/5 rounded-t-xl border-b border-border-color">
+        <div className="flex flex-wrap gap-2 px-10 py-3 bg-black/5 dark:bg-white/5 border-b border-border-color backdrop-blur-md">
             <Button action="summarize" icon={FileText} label="Summarize" onClick={handleSummarize} />
             <Button action="expand" icon={Sparkles} label="Expand" onClick={handleExpand} />
             

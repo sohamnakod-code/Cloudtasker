@@ -25,8 +25,11 @@ function DashboardContent() {
 
     return (
         <Layout>
-            <div className="h-full w-full">
-                <RichTextEditor />
+            <div className="h-full w-full relative">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none z-0"></div>
+                <div className="relative z-10 h-full w-full pb-10">
+                    <RichTextEditor />
+                </div>
             </div>
         </Layout>
     );
